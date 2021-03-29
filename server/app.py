@@ -14,10 +14,13 @@ def create_app():
     migrate.init_app(app, db)
     marshmallow.init_app(app)
 
-    # # CORS
+    # CORS
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
     cors.init_app(app)
+
     # blueprint apps
     app.register_blueprint(books_blueprint, url_prefix='/api/books')
+
+    # static files for dev
 
     return app
