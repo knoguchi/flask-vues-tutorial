@@ -1,3 +1,5 @@
 flask-migrate
 flask-cors
 flask-marshmallow
+marshmallow-sqlalchemy
+flask-assets

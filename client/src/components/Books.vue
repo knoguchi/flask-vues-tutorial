@@ -11,6 +11,7 @@
         <table class="table table-hover">
           <thead>
           <tr>
+            <th scope="col">ISBN13</th>
             <th scope="col">Title</th>
             <th scope="col">Author</th>
             <th scope="col">Read?</th>
@@ -19,6 +20,7 @@
           </thead>
           <tbody>
           <tr v-for="(book, index) in books" :key="index">
+            <td>{{ book.id }}</td>
             <td>{{ book.title }}</td>
             <td>{{ book.author }}</td>
             <td>
@@ -28,7 +30,9 @@
             <td>
               <div class="btn-group" role="group">
                 <button type="button" class="btn btn-warning btn-sm">Update</button>
-                <button type="button" class="btn btn-danger btn-sm">Delete</button>
+                <button type="button" class="btn btn-danger btn-sm"
+                        @click="onDeleteBook(book)">Delete
+                </button>
               </div>
             </td>
           </tr>
@@ -41,6 +45,16 @@
              title="Add a new book"
              hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+        <b-form-group id="form-title-group"
+                      label="ISBN13:"
+                      label-for="form-id-input">
+          <b-form-input id="form-id-input"
+                        type="text"
+                        v-model="addBookForm.id"
+                        required
+                        placeholder="Enter ISBN13">
+          </b-form-input>
+        </b-form-group>
         <b-form-group id="form-title-group"
                       label="Title:"
                       label-for="form-title-input">
@@ -83,6 +97,7 @@ export default {
     return {
       books: [],
       addBookForm: {
+        id: '',
         title: '',
         author: '',
         read: [],
@@ -120,7 +135,25 @@ export default {
           this.getBooks();
         });
     },
+    removeBook(bookID) {
+      const path = `http://localhost:5000/api/books/${bookID}`;
+      axios.delete(path)
+        .then(() => {
+          this.getBooks();
+          this.message = 'Book removed!';
+          this.showMessage = true;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+          this.getBooks();
+        });
+    },
+    onDeleteBook(book) {
+      this.removeBook(book.id);
+    },
     initForm() {
+      this.addBookForm.id = '';
       this.addBookForm.title = '';
       this.addBookForm.author = '';
       this.addBookForm.read = [];
@@ -131,6 +164,7 @@ export default {
       let read = false;
       if (this.addBookForm.read[0]) read = true;
       const payload = {
+        id: this.addBookForm.id,
         title: this.addBookForm.title,
         author: this.addBookForm.author,
         read, // property shorthand
